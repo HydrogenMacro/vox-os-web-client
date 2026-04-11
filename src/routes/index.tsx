@@ -1,5 +1,5 @@
-import { Button } from "@/components/ui/button";
 import { createFileRoute, Link } from "@tanstack/react-router";
+import '@fontsource-variable/outfit/wght.css';
 
 export const Route = createFileRoute("/")({
     component: IndexRouteComponent,
@@ -18,13 +18,9 @@ function IndexRouteComponent() {
                         <br /> Works with any earbud.
                     </p>
                     <div className="flex gap-5 pt-3">
-                        <Button asChild className="gap-2">
-                            <Link to="/app">Get Started</Link>
-                        </Button>
+                        <Link to="/app" className="btn btn-primary">Get Started</Link>
 
-                        <Button asChild className="gap-2" variant="secondary">
-                            <Link to="/app">Learn More</Link>
-                        </Button>
+                        <Link to="/app" className="btn btn-neutral">Learn More</Link>
                     </div>
                 </div>
             </div>

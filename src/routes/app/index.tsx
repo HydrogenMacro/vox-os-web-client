@@ -1,19 +1,6 @@
-import { Button } from "@/components/ui/button";
-import {
-    Empty,
-    EmptyDescription,
-    EmptyHeader,
-    EmptyTitle,
-} from "@/components/ui/empty";
-import {
-    Item,
-    ItemContent,
-    ItemDescription,
-    ItemTitle,
-} from "@/components/ui/item";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
+import { Send } from "lucide-react";
 import { useEffect } from "react";
-import { toast } from "sonner";
 import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
 
@@ -39,13 +26,12 @@ function App() {
         (state) => state.microphoneStream,
     );
 
-    return (
-        <div>{microphoneStream ? <MainMenu /> : <PermissionsDisplay />}</div>
-    );
+    return <ChatTab />;
 }
 
-function MainMenu() {
+function ChatTab() {
     useEffect(() => {
+        /*
         (async () => {
             const myvad = await vad.MicVAD.new({
                 onSpeechStart: () => {
@@ -58,60 +44,40 @@ function MainMenu() {
                     "https://cdn.jsdelivr.net/npm/@ricky0123/vad-web@0.0.29/dist/",
             });
             myvad.start();
-        })();
+        })();*/
     }, []);
     return (
-        <div className="grid grid-rows-2 p-4 gap-4">
-            <Item asChild>
-                <Link to="/app">
-                    <ItemContent>
-                        <ItemTitle>Transcription</ItemTitle>
-                        <ItemDescription>Transcribe text.</ItemDescription>
-                    </ItemContent>
-                </Link>
-            </Item>
-            <Item asChild>
-                <Link to="/app">
-                    <ItemContent>
-                        <ItemTitle>Translation</ItemTitle>
-                        <ItemDescription>Transcribe text.</ItemDescription>
-                    </ItemContent>
-                </Link>
-            </Item>
-            <Item asChild>
-                <Link to="/app">
-                    <ItemContent>
-                        <ItemTitle>Chat</ItemTitle>
-                        <ItemDescription>Transcribe text.</ItemDescription>
-                    </ItemContent>
-                </Link>
-            </Item>
+        <div className="flex-1 flex flex-col items-stretch min-h-0">
+            <div className="flex-1 flex flex-col-reverse p-4 text-sm gap-4 overflow-scroll min-h-0">
+                <div className="w-8/12 wrap-break-word whitespace-break-spaces bg-neutral-600/50 p-2 self-end">
+                    {"Text ".repeat(50)}
+                </div>
+                <div className="w-full wrap-break-word whitespace-break-spaces bg-neutral-600/50 p-2">
+                    {"Text ".repeat(50)}
+                </div>
+                <div className="w-8/12 wrap-break-word whitespace-break-spaces bg-neutral-600/50 p-2 self-end">
+                    {"Text ".repeat(50)}
+                </div>
+                <div className="w-full wrap-break-word whitespace-break-spaces bg-neutral-600/50 p-2">
+                    {"Text ".repeat(50)}
+                </div>
+                <div className="w-8/12 wrap-break-word whitespace-break-spaces bg-neutral-600/50 p-2 self-end">
+                    {"Text ".repeat(50)}
+                </div>
+                <div className="w-full wrap-break-word whitespace-break-spaces bg-neutral-600/50 p-2">
+                    {"Text ".repeat(50)}
+                </div>
+                <div className="w-8/12 wrap-break-word whitespace-break-spaces bg-neutral-600/50 p-2 self-end">
+                    {"Text ".repeat(50)}
+                </div>
+                <div className="w-full wrap-break-word whitespace-break-spaces bg-neutral-600/50 p-2">
+                    {"Text ".repeat(50)}
+                </div>
+            </div>
+            <div className="flex h-20 bg-base-200 p-4 gap-4 text-sm">
+                <input name="chat-input" type="text" placeholder="Type a question..." className="flex-1 p-4 bg-neutral-500/50"/>
+                <div className="aspect-square flex items-center justify-center rounded-full bg-primary"><Send size={20}/></div>
+            </div>
         </div>
-    );
-}
-function PermissionsDisplay() {
-    const setMicrophoneStream = usePermissionsStore(
-        (state) => state.setMicrophoneStream,
-    );
-    async function getMicrophonePermissions() {
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({
-                audio: true,
-            });
-            setMicrophoneStream(stream);
-        } catch {
-            toast("gay");
-        }
-    }
-    return (
-        <Empty>
-            <EmptyHeader>
-                <EmptyTitle>Set Up Permissions</EmptyTitle>
-                <EmptyDescription>
-                    Microphone permissions are neccesary to use this app.
-                </EmptyDescription>
-                <Button onClick={getMicrophonePermissions}></Button>
-            </EmptyHeader>
-        </Empty>
     );
 }
