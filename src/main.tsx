@@ -7,6 +7,7 @@ import {
     RouterProvider,
 } from "@tanstack/react-router";
 import { routeTree } from "./routeTree.gen";
+import { enableMapSet } from "immer";
 
 const router = createRouter({
     routeTree,
@@ -16,6 +17,7 @@ declare module "@tanstack/react-router" {
         router: typeof router;
     }
 }
+
 createRoot(document.getElementById("root")!).render(
     <>
         <StrictMode>

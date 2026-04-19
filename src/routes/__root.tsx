@@ -7,7 +7,10 @@ export const Route = createRootRoute({
 function RootRouteComponent() {
     return (
         <>
+        <div className="min-w-dvw min-h-dvh h-dvh w-dvw">
             <Outlet />
+        </div>
+            
             {//<TanStackRouterDevtools />
             }
         </>

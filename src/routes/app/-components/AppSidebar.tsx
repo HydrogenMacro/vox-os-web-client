@@ -1,40 +1,16 @@
+import { createTogglableStore } from "@/lib/togglableStore";
 import { cn } from "@/lib/utils/cn";
 import { Link, useLocation, useRouter } from "@tanstack/react-router";
-import { Book, Cog, Menu, MessageCircle } from "lucide-react";
+import { Book, Cog, History, Menu, MessageCircle } from "lucide-react";
 import { useEffect } from "react";
-import { create } from "zustand";
-import { immer } from "zustand/middleware/immer";
+import { useSnapshot } from "valtio";
 
-interface SidebarStore {
-    isOpen: boolean;
-    toggle: () => void;
-    close: () => void;
-    open: () => void;
-}
-export const useSidebarStore = create<SidebarStore>()(
-    immer((set) => ({
-        isOpen: false,
-        toggle: () =>
-            set((s) => {
-                s.isOpen = !s.isOpen;
-            }),
-        close: () =>
-            set((s) => {
-                s.isOpen = false;
-            }),
-        open: () =>
-            set((s) => {
-                s.isOpen = true;
-            }),
-    })),
-);
+export const sidebarStore = createTogglableStore(false);
 export function AppSidebar() {
-    const closeSidebar = useSidebarStore((s) => s.close);
-    const sidebarIsOpen = useSidebarStore((s) => s.isOpen);
+    const { off: closeSidebar, isOn: sidebarIsOpen } = useSnapshot(sidebarStore);
     const router = useRouter();
     useEffect(() => {
         return router.subscribe("onResolved", () => {
-            console.log(2);
             closeSidebar();
         });
     }, []);
@@ -59,6 +35,7 @@ export function AppSidebar() {
                 {(
                     [
                         [<MessageCircle />, "Chat", "/app"],
+                        [<History />, "History", "/app/records"],
                         [<Book />, "Records", "/app/records"],
                         [<Cog />, "Settings", "/app/records"],
                     ] as const
@@ -80,7 +57,7 @@ export function AppSidebar() {
 }
 
 export function AppSidebarButton() {
-    const openSidebar = useSidebarStore((s) => s.open);
+    const { on: openSidebar } = useSnapshot(sidebarStore);
     return (
         <button className="btn btn-square btn-ghost" onClick={openSidebar}>
             <Menu />

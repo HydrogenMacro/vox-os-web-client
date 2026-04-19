@@ -18,9 +18,9 @@ function IndexRouteComponent() {
                         <br /> Works with any earbud.
                     </p>
                     <div className="flex gap-5 pt-3">
-                        <Link to="/app" className="btn btn-primary">Get Started</Link>
+                        <Link to="/sign-up" className="btn btn-primary">Get Started</Link>
 
-                        <Link to="/app" className="btn btn-neutral">Learn More</Link>
+                        <Link to="/log-in" className="btn btn-neutral">Log In</Link>
                     </div>
                 </div>
             </div>

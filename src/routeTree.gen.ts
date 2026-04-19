@@ -10,13 +10,22 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AppRouteRouteImport } from './routes/app/route'
+import { Route as authRouteRouteImport } from './routes/(auth)/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppIndexRouteImport } from './routes/app/index'
 import { Route as AppRecordsRouteImport } from './routes/app/records'
+import { Route as miscTermsOfServiceRouteImport } from './routes/(misc)/terms-of-service'
+import { Route as miscPrivacyPolicyRouteImport } from './routes/(misc)/privacy-policy'
+import { Route as authSignUpRouteImport } from './routes/(auth)/sign-up'
+import { Route as authLogInRouteImport } from './routes/(auth)/log-in'
 
 const AppRouteRoute = AppRouteRouteImport.update({
   id: '/app',
   path: '/app',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const authRouteRoute = authRouteRouteImport.update({
+  id: '/(auth)',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -34,36 +43,97 @@ const AppRecordsRoute = AppRecordsRouteImport.update({
   path: '/records',
   getParentRoute: () => AppRouteRoute,
 } as any)
+const miscTermsOfServiceRoute = miscTermsOfServiceRouteImport.update({
+  id: '/(misc)/terms-of-service',
+  path: '/terms-of-service',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const miscPrivacyPolicyRoute = miscPrivacyPolicyRouteImport.update({
+  id: '/(misc)/privacy-policy',
+  path: '/privacy-policy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const authSignUpRoute = authSignUpRouteImport.update({
+  id: '/sign-up',
+  path: '/sign-up',
+  getParentRoute: () => authRouteRoute,
+} as any)
+const authLogInRoute = authLogInRouteImport.update({
+  id: '/log-in',
+  path: '/log-in',
+  getParentRoute: () => authRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/app': typeof AppRouteRouteWithChildren
+  '/log-in': typeof authLogInRoute
+  '/sign-up': typeof authSignUpRoute
+  '/privacy-policy': typeof miscPrivacyPolicyRoute
+  '/terms-of-service': typeof miscTermsOfServiceRoute
   '/app/records': typeof AppRecordsRoute
   '/app/': typeof AppIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/log-in': typeof authLogInRoute
+  '/sign-up': typeof authSignUpRoute
+  '/privacy-policy': typeof miscPrivacyPolicyRoute
+  '/terms-of-service': typeof miscTermsOfServiceRoute
   '/app/records': typeof AppRecordsRoute
   '/app': typeof AppIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/(auth)': typeof authRouteRouteWithChildren
   '/app': typeof AppRouteRouteWithChildren
+  '/(auth)/log-in': typeof authLogInRoute
+  '/(auth)/sign-up': typeof authSignUpRoute
+  '/(misc)/privacy-policy': typeof miscPrivacyPolicyRoute
+  '/(misc)/terms-of-service': typeof miscTermsOfServiceRoute
   '/app/records': typeof AppRecordsRoute
   '/app/': typeof AppIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/app' | '/app/records' | '/app/'
+  fullPaths:
+    | '/'
+    | '/app'
+    | '/log-in'
+    | '/sign-up'
+    | '/privacy-policy'
+    | '/terms-of-service'
+    | '/app/records'
+    | '/app/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/app/records' | '/app'
-  id: '__root__' | '/' | '/app' | '/app/records' | '/app/'
+  to:
+    | '/'
+    | '/log-in'
+    | '/sign-up'
+    | '/privacy-policy'
+    | '/terms-of-service'
+    | '/app/records'
+    | '/app'
+  id:
+    | '__root__'
+    | '/'
+    | '/(auth)'
+    | '/app'
+    | '/(auth)/log-in'
+    | '/(auth)/sign-up'
+    | '/(misc)/privacy-policy'
+    | '/(misc)/terms-of-service'
+    | '/app/records'
+    | '/app/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  authRouteRoute: typeof authRouteRouteWithChildren
   AppRouteRoute: typeof AppRouteRouteWithChildren
+  miscPrivacyPolicyRoute: typeof miscPrivacyPolicyRoute
+  miscTermsOfServiceRoute: typeof miscTermsOfServiceRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -73,6 +143,13 @@ declare module '@tanstack/react-router' {
       path: '/app'
       fullPath: '/app'
       preLoaderRoute: typeof AppRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(auth)': {
+      id: '/(auth)'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof authRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -96,8 +173,50 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppRecordsRouteImport
       parentRoute: typeof AppRouteRoute
     }
+    '/(misc)/terms-of-service': {
+      id: '/(misc)/terms-of-service'
+      path: '/terms-of-service'
+      fullPath: '/terms-of-service'
+      preLoaderRoute: typeof miscTermsOfServiceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(misc)/privacy-policy': {
+      id: '/(misc)/privacy-policy'
+      path: '/privacy-policy'
+      fullPath: '/privacy-policy'
+      preLoaderRoute: typeof miscPrivacyPolicyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(auth)/sign-up': {
+      id: '/(auth)/sign-up'
+      path: '/sign-up'
+      fullPath: '/sign-up'
+      preLoaderRoute: typeof authSignUpRouteImport
+      parentRoute: typeof authRouteRoute
+    }
+    '/(auth)/log-in': {
+      id: '/(auth)/log-in'
+      path: '/log-in'
+      fullPath: '/log-in'
+      preLoaderRoute: typeof authLogInRouteImport
+      parentRoute: typeof authRouteRoute
+    }
   }
 }
+
+interface authRouteRouteChildren {
+  authLogInRoute: typeof authLogInRoute
+  authSignUpRoute: typeof authSignUpRoute
+}
+
+const authRouteRouteChildren: authRouteRouteChildren = {
+  authLogInRoute: authLogInRoute,
+  authSignUpRoute: authSignUpRoute,
+}
+
+const authRouteRouteWithChildren = authRouteRoute._addFileChildren(
+  authRouteRouteChildren,
+)
 
 interface AppRouteRouteChildren {
   AppRecordsRoute: typeof AppRecordsRoute
@@ -115,7 +234,10 @@ const AppRouteRouteWithChildren = AppRouteRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  authRouteRoute: authRouteRouteWithChildren,
   AppRouteRoute: AppRouteRouteWithChildren,
+  miscPrivacyPolicyRoute: miscPrivacyPolicyRoute,
+  miscTermsOfServiceRoute: miscTermsOfServiceRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -1,14 +1,14 @@
 <!doctype html>
-<html lang="en" class="dark">
+<html lang="en" class="dark overscroll-none">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
     <title>vox-os-web-client</title>
     <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web@1.22.0/dist/ort.wasm.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@ricky0123/vad-web@0.0.29/dist/bundle.min.js"></script>
   </head>
-  <body>
+  <body class="overscroll-none">
     <div id="root" class="font-body"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

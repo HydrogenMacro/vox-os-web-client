@@ -13,8 +13,10 @@ import {
 } from "lucide-react";
 import { type CSSProperties, type Ref } from "react";
 import { appConfig } from "../-state/appConfig";
+import { statusToastStore } from "./StatusToast";
+import { useSnapshot } from "valtio";
 
-export const useFloatingTranscriptStore = createTogglableStore();
+export const floatingTranscriptStore = createTogglableStore();
 export function FloatingTranscript({
     ref,
     style,
@@ -22,41 +24,45 @@ export function FloatingTranscript({
     ref?: Ref<HTMLDivElement>;
     style?: CSSProperties;
 }) {
-    const isOpen = useFloatingTranscriptStore((s) => s.isOn);
-    const toggleOpen = useFloatingTranscriptStore((s) => s.toggle);
+    const statusToastSnap = useSnapshot(statusToastStore);
+    const floatingTranscriptSnap = useSnapshot(floatingTranscriptStore);
     return (
         <div
             ref={ref}
             style={style}
             className={cn(
-                "w-[calc(100%-16px)] h-50 flex flex-col items-stretch backdrop-blur-[2px] transition-[height,opacity] duration-500 overflow-hidden opacity-95",
-                !isOpen && "h-0 opacity-0",
+                "w-[calc(100%-16px)] h-72 flex flex-col items-stretch backdrop-blur-[2px] transition-[height,opacity] duration-500 overflow-hidden opacity-95",
+                !floatingTranscriptSnap.isOn && "h-0 opacity-0",
             )}
         >
             <div className="flex">
                 {(
                     [
-                        [<Mic />, <MicOff />, appConfig.useMicEnabled],
-                        [<Bot />, <BotOff />, appConfig.useChatBotEnabled],
+                        [<Mic />, <MicOff />, appConfig.useMicEnabled, "Microphone"],
+                        [<Bot />, <BotOff />, appConfig.useChatBotEnabled, "Agent Listening"],
                         [
                             <Megaphone />,
                             <MegaphoneOff />,
                             appConfig.useAnnouncingEnabled,
+                            "Agent Speaking"
                         ],
-                        [<Cctv />, <CctvOff />, appConfig.useRecordingEnabled],
+                        [<Cctv />, <CctvOff />, appConfig.useRecordingEnabled, "Transcribing"],
                     ] as const
-                ).map(([icon, disabledIcon, useConfigOptionEnabled], i) => {
-                    const configOptionEnabled = useConfigOptionEnabled();
+                ).map(([icon, disabledIcon, configOptionStore, controlName], i) => {
+                    const configOptionSnap = useSnapshot(configOptionStore);
                     return (
                         <button
                             className={cn(
                                 "flex-1 aspect-square h-auto btn btn-soft rounded-none active:translate-none",
-                                !configOptionEnabled.isOn && "btn-active",
+                                configOptionSnap.isOn && "btn-active",
                             )}
-                            onClick={configOptionEnabled.toggle}
+                            onClick={() => {
+                                configOptionSnap.toggle();
+                                statusToastStore.showMessage(`${controlName}:\n${configOptionSnap.isOn ? "Enabled" : "Disabled"}`, "short");
+                            }}
                             key={i}
                         >
-                            {configOptionEnabled.isOn ? icon : disabledIcon}
+                            {!configOptionSnap.isOn ? icon : disabledIcon}
                         </button>
                     );
                 })}
@@ -71,13 +77,14 @@ export function FloatingTranscript({
                 <div>Line 3</div>
                 <div>Line 4</div>
                 <div>Line 5</div>
+                <div>Line 6</div>
             </div>
 
             <button
                 className={cn(
                     "h-8 flex items-center justify-center bg-base-200/50 transition-colors",
                 )}
-                onClick={toggleOpen}
+                onClick={statusToastSnap.hide}
             >
                 <ChevronUp />
             </button>

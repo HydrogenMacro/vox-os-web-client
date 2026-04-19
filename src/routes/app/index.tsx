@@ -1,82 +1,58 @@
+import { cn } from "@/lib/utils/cn";
 import { createFileRoute } from "@tanstack/react-router";
 import { Send } from "lucide-react";
-import { useEffect } from "react";
-import { create } from "zustand";
-import { immer } from "zustand/middleware/immer";
+import { useEffect, useState } from "react";
+import { proxy, useSnapshot } from "valtio";
+import { createChatBoxFromMessage } from "./-components/ChatBox";
+import { chatStore } from "./-state/chat";
+import { startVAD } from "./-state/voice";
 
 export const Route = createFileRoute("/app/")({
     component: App,
 });
 
-const usePermissionsStore = create<{
+const permissionsStore = proxy<{
     microphoneStream: MediaStream | null;
     setMicrophoneStream: (stream: MediaStream) => void;
-}>()(
-    immer((set) => ({
-        microphoneStream: null,
-        setMicrophoneStream: (stream: MediaStream) =>
-            set((state) => {
-                state.microphoneStream = stream;
-            }),
-    })),
-);
+}>({
+    microphoneStream: null,
+    setMicrophoneStream(stream: MediaStream) {
+        permissionsStore.microphoneStream = stream;
+    },
+});
 
 function App() {
-    const microphoneStream = usePermissionsStore(
-        (state) => state.microphoneStream,
-    );
+    const { microphoneStream } = useSnapshot(permissionsStore);
 
     return <ChatTab />;
 }
 
 function ChatTab() {
+    const chatSnap = useSnapshot(chatStore);
+    const [inputText, setInputText] = useState("");
     useEffect(() => {
-        /*
-        (async () => {
-            const myvad = await vad.MicVAD.new({
-                onSpeechStart: () => {
-                    console.log("Speech start detected");
-                },
-                onSpeechEnd: () => {},
-                onnxWASMBasePath:
-                    "https://cdn.jsdelivr.net/npm/onnxruntime-web@1.22.0/dist/",
-                baseAssetPath:
-                    "https://cdn.jsdelivr.net/npm/@ricky0123/vad-web@0.0.29/dist/",
-            });
-            myvad.start();
-        })();*/
+        startVAD();
     }, []);
     return (
         <div className="flex-1 flex flex-col items-stretch min-h-0">
             <div className="flex-1 flex flex-col-reverse p-4 text-sm gap-4 overflow-scroll min-h-0">
-                <div className="w-8/12 wrap-break-word whitespace-break-spaces bg-neutral-600/50 p-2 self-end">
-                    {"Text ".repeat(50)}
-                </div>
-                <div className="w-full wrap-break-word whitespace-break-spaces bg-neutral-600/50 p-2">
-                    {"Text ".repeat(50)}
-                </div>
-                <div className="w-8/12 wrap-break-word whitespace-break-spaces bg-neutral-600/50 p-2 self-end">
-                    {"Text ".repeat(50)}
-                </div>
-                <div className="w-full wrap-break-word whitespace-break-spaces bg-neutral-600/50 p-2">
-                    {"Text ".repeat(50)}
-                </div>
-                <div className="w-8/12 wrap-break-word whitespace-break-spaces bg-neutral-600/50 p-2 self-end">
-                    {"Text ".repeat(50)}
-                </div>
-                <div className="w-full wrap-break-word whitespace-break-spaces bg-neutral-600/50 p-2">
-                    {"Text ".repeat(50)}
-                </div>
-                <div className="w-8/12 wrap-break-word whitespace-break-spaces bg-neutral-600/50 p-2 self-end">
-                    {"Text ".repeat(50)}
-                </div>
-                <div className="w-full wrap-break-word whitespace-break-spaces bg-neutral-600/50 p-2">
-                    {"Text ".repeat(50)}
-                </div>
+                {chatSnap.messages.map(createChatBoxFromMessage)}
             </div>
-            <div className="flex h-20 bg-base-200 p-4 gap-4 text-sm">
-                <input name="chat-input" type="text" placeholder="Type a question..." className="flex-1 p-4 bg-neutral-500/50"/>
-                <div className="aspect-square flex items-center justify-center rounded-full bg-primary"><Send size={20}/></div>
+            <div className="flex bg-base-200 p-4 gap-4 text-sm items-end">
+                <div
+                    contentEditable
+                    className={cn(
+                        inputText == "" &&
+                            "after:content-['Type_A_Message...'] after:text-base-content/60 after:absolute",
+                        "text flex-1 flex flex-col scroll-p-2.5 p-2.5 bg-neutral-500/50 min-w-0 wrap-break-word overflow-auto max-h-[calc((var(--text-sm--line-height)*var(--text-sm)-var(--spacing)*2)+var(--text-sm--line-height)*4*var(--text-sm))]",
+                    )}
+                    onInput={(ev) =>
+                        setInputText((ev.target as HTMLDivElement).textContent)
+                    }
+                ></div>
+                <div className="btn btn-primary btn-circle">
+                    <Send size={16} />
+                </div>
             </div>
         </div>
     );
