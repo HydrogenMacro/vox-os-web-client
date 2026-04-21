@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { Eye, EyeOff } from "lucide-react";
+import { ArrowLeft, Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import { useSnapshot } from "valtio";
 import { toastsStore } from "./route";
@@ -12,7 +12,6 @@ function RouteComponent() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [passwordVisible, setPasswordVisible] = useState(false);
-    const toastsSnap = useSnapshot(toastsStore);
     
     const navigate = useNavigate();
     const onSubmit = async () => {
@@ -36,7 +35,7 @@ function RouteComponent() {
             navigate({ to: "/app" })
         } catch(e) {
             console.error("Error:", e);
-            toastsSnap.addToast(JSON.stringify(e))
+            toastsStore.addToast(JSON.stringify(e))
         }
     }
 
@@ -60,7 +59,10 @@ function RouteComponent() {
     
     return (
         <div className="flex w-full h-full items-center justify-center">
-            <div className="w-[calc(100%-var(--spacing)*24)] bg-base-300 flex flex-col items-center p-8">
+            <div className="w-[calc(100%-var(--spacing)*24)] bg-base-300 flex flex-col items-center p-8 relative">
+                <div className="absolute left-0 top-0 p-4">
+                    <Link to="/" className="btn btn-circle btn-ghost"><ArrowLeft /></Link>
+                </div>
                 <h1 className="text-3xl pt-4 pb-1 text-center">Log In</h1>
                 <small className="text-xs pb-4">Need an account? <Link to="/sign-up" className="link link-primary">Sign Up</Link></small>
                 <fieldset className="fieldset w-full">

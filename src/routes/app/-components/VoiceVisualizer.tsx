@@ -1,7 +1,7 @@
 import { micAudio, runVoiceSimulation } from "@/routes/app/-state/voice";
 import { useEffect, useRef, useState } from "react";
 
-export function VoiceVisualizer() {
+export function VoiceVisualizer({ segmentSize = 20 }: { segmentSize?: number }) {
     const cvsRef = useRef<HTMLCanvasElement>(null!);
     const [signal, setSignalVal] = useState(true);
 
@@ -13,7 +13,7 @@ export function VoiceVisualizer() {
             cvsRef.current.clientWidth * dpr);
         const cvsHeight = (cvsRef.current.height =
             cvsRef.current.clientHeight * dpr);
-        const segmentsCount = 20;
+        const segmentsCount = Math.floor(cvsWidth / segmentSize);
                 
         const ro = new ResizeObserver(() => setSignalVal((s) => !s));
         ro.observe(cvsRef.current);

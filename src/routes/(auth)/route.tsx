@@ -1,36 +1,42 @@
+import { RingBuffer } from '@/lib/utils/ringBuffer';
 import { createFileRoute, Outlet } from '@tanstack/react-router'
 import { XCircle } from 'lucide-react';
 import { useEffect, useState, type PropsWithChildren } from 'react'
-import { proxy, useSnapshot } from 'valtio';
+import { proxy, ref, useSnapshot } from 'valtio';
 
 export const Route = createFileRoute('/(auth)')({
   component: RouteComponent,
 })
 
-let id = 0;
 
+
+export type Toast = { expirationTimestamp: number, text: string }
 export const toastsStore = proxy<{
-  toasts: Record<string, string>,
-  addToast: (toast: string) => number,
+  toasts: RingBuffer<Toast>,
+  addToast: (toast: string) => void,
 }>({
-  toasts: {},
-  addToast(toast: string) {
-    const toastId = id++;
-    toastsStore.toasts[toastId] = "" + toast + toastId;
-    setTimeout(() => {
-        delete toastsStore.toasts[String(toastId)];
-    }, 3000);
-    return toastId;
+  toasts: new RingBuffer(3),
+  addToast(text: string) {
+    this.toasts.pushEnd({ text, expirationTimestamp: Date.now() + 3500 });
   }
 });
 
 function ToastContainer() {
-    const { toasts } = useSnapshot(toastsStore)
+    const { toasts } = useSnapshot(toastsStore);
     useEffect(() => {
-      console.log(toasts)
-    }, [toasts]);
+      const intervalId = setInterval(() => {
+        let oldestToast = toastsStore.toasts.get(0);
+        if (!oldestToast) return;
+        if (Date.now() > oldestToast.expirationTimestamp) {
+          toastsStore.toasts.popStart();
+        }
+      }, 100);
+      return () => {
+        clearInterval(intervalId);
+      }
+    }, []);
     return <div className="toast toast-center toast-top">
-        {Object.values(toasts).map((toastMessage, i) => <Toast key={i}>{toastMessage}</Toast>)}
+        {toasts.map((toast, i) => <Toast key={i}>{toast.text}</Toast>)}
     </div>
 }
 function Toast({ children }: PropsWithChildren<{}>) {
